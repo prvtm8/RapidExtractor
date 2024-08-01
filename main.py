@@ -5,11 +5,22 @@ import time
 import logging
 from prefetch_extractor import copy_prefetch_files
 from dir_tree_extractor import extract_dir_tree
-from eventlog_extractor import copy_event_logs
 from process_extractor import save_running_processes, save_running_tasks
 from installed_programs_extractor import save_installed_programs
+from teamviewer_extractor import copy_teamviewer_files
+from cbc_extractor import copy_cbc_files
+from browser_history_extractor import extract_browser_histories
 
 def create_target_folder(target_device_name):
+    """
+    Create a target folder for the extraction process.
+
+    Args:
+        target_device_name (str): The name of the target device.
+
+    Returns:
+        str: The path to the created target directory.
+    """
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     target_dir = os.path.join(base_dir, f'{target_device_name}_extraction')
     if not os.path.exists(target_dir):
@@ -17,6 +28,13 @@ def create_target_folder(target_device_name):
     return target_dir
 
 def zip_directory(directory_path, zip_name):
+    """
+    Zip a directory and remove the original directory after zipping.
+
+    Args:
+        directory_path (str): The path to the directory to zip.
+        zip_name (str): The name of the zip file to create.
+    """
     logging.info(f"Zipping directory {directory_path} to {zip_name}.zip...")
     shutil.make_archive(zip_name, 'zip', directory_path)
     logging.info(f"Zipped {zip_name}.zip successfully.")
@@ -24,6 +42,13 @@ def zip_directory(directory_path, zip_name):
     logging.info(f"Removed original directory {directory_path}.")
 
 def main(selected_modules, target_device_name):
+    """
+    Main function to perform the data extraction based on the selected modules.
+
+    Args:
+        selected_modules (list): List of selected modules for extraction.
+        target_device_name (str): The name of the target device.
+    """
     target_dir_base = create_target_folder(target_device_name)
 
     # Configure logging to use a file in the target directory
@@ -33,6 +58,7 @@ def main(selected_modules, target_device_name):
 
     logging.info("Starting data extraction...")
 
+    # Perform data extraction for each selected module
     if 'prefetch' in selected_modules:
         logging.info("Starting Prefetch extraction...")
         try:
@@ -58,19 +84,6 @@ def main(selected_modules, target_device_name):
             logging.info(f"Directory Tree extraction completed in {end_time - start_time:.2f} seconds.")
         except Exception as e:
             logging.error(f"Directory Tree extraction failed: {e}")
-
-    if 'event_logs' in selected_modules:
-        logging.info("Starting Event Log extraction...")
-        try:
-            start_time = time.time()
-            event_logs_target_dir = os.path.join(target_dir_base, 'EventLogs_export')
-            copy_event_logs(event_logs_target_dir)
-            zip_name = os.path.join(target_dir_base, 'EventLogs_export')
-            zip_directory(event_logs_target_dir, zip_name)
-            end_time = time.time()
-            logging.info(f"Event Log extraction completed in {end_time - start_time:.2f} seconds.")
-        except Exception as e:
-            logging.error(f"Event Log extraction failed: {e}")
 
     if 'processes' in selected_modules:
         logging.info("Starting Running Processes and Tasks extraction...")
@@ -99,7 +112,47 @@ def main(selected_modules, target_device_name):
         except Exception as e:
             logging.error(f"Installed Programs extraction failed: {e}")
 
+    if 'teamviewer' in selected_modules:
+        logging.info("Starting TeamViewer extraction...")
+        try:
+            start_time = time.time()
+            teamviewer_target_dir = os.path.join(target_dir_base, 'TeamViewer_export')
+            copy_teamviewer_files(teamviewer_target_dir)
+            zip_name = os.path.join(target_dir_base, 'TeamViewer_export')
+            zip_directory(teamviewer_target_dir, zip_name)
+            end_time = time.time()
+            logging.info(f"TeamViewer extraction completed in {end_time - start_time:.2f} seconds.")
+        except Exception as e:
+            logging.error(f"TeamViewer extraction failed: {e}")
+
+    if 'cbc' in selected_modules:
+        logging.info("Starting CBC extraction...")
+        try:
+            start_time = time.time()
+            cbc_target_dir = os.path.join(target_dir_base, 'CBC_export')
+            copy_cbc_files(cbc_target_dir)
+            zip_name = os.path.join(target_dir_base, 'CBC_export')
+            zip_directory(cbc_target_dir, zip_name)
+            end_time = time.time()
+            logging.info(f"CBC extraction completed in {end_time - start_time:.2f} seconds.")
+        except Exception as e:
+            logging.error(f"CBC extraction failed: {e}")
+
+    if 'browser_history' in selected_modules:
+        logging.info("Starting Browser History extraction...")
+        try:
+            start_time = time.time()
+            browser_history_target_dir = os.path.join(target_dir_base, 'BrowserHistory_export')
+            extract_browser_histories(browser_history_target_dir)
+            zip_name = os.path.join(target_dir_base, 'BrowserHistory_export')
+            zip_directory(browser_history_target_dir, zip_name)
+            end_time = time.time()
+            logging.info(f"Browser History extraction completed in {end_time - start_time:.2f} seconds.")
+        except Exception as e:
+            logging.error(f"Browser History extraction failed: {e}")
+
     logging.info("Data extraction completed. Only ZIP files are left in the Target folder.")
+    input("Press any key to close the window...")
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

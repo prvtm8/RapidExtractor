@@ -1,13 +1,27 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox
+import sys
+import os
 
 def generate_batch_file(selected_modules, target_device_name):
+    """
+    Generate a batch file with the selected modules and target device name.
+
+    Args:
+        selected_modules (str): The selected modules as a string.
+        target_device_name (str): The name of the target device.
+
+    The batch file will be saved in the current working directory.
+    """
     batch_file_content = f"""@echo off
+REM Dynamically determine the drive letter of the USB stick
+set USB_DRIVE=%~d0
+
 REM Set the path to the portable Python interpreter
-set "PYTHON_PATH=E:\\WPy64-31241\\python-3.12.4.amd64\\python.exe"
+set "PYTHON_PATH=%USB_DRIVE%\\WPy64-31241\\python-3.12.4.amd64\\python.exe"
 
 REM Set the path to the main Python script
-set "SCRIPT_PATH=E:\\RapidExtractor\\Scripts\\main.py"
+set "SCRIPT_PATH=%USB_DRIVE%\\RapidExtractor\\Scripts\\main.py"
 
 REM Debug output
 echo Python Path: %PYTHON_PATH%
@@ -40,6 +54,9 @@ pause
     messagebox.showinfo("Success", f"Batch file '{batch_file_name}' has been created successfully.")
 
 def create_gui():
+    """
+    Create the GUI for selecting modules and generating the batch file.
+    """
     root = tk.Tk()
     root.title("Module Selector")
 
@@ -49,7 +66,7 @@ def create_gui():
         root.destroy()
         sys.exit()
 
-    root.withdraw()  # Hide the main window during module selection
+    root.withdraw()
 
     selected_modules = []
     select_all_state = tk.BooleanVar(value=True)
@@ -75,9 +92,11 @@ def create_gui():
     modules = [
         ("DirTree", tk.BooleanVar(name="dir_tree")),
         ("Prefetch", tk.BooleanVar(name="prefetch")),
-        ("Event Logs", tk.BooleanVar(name="event_logs")),
         ("Processes", tk.BooleanVar(name="processes")),
         ("Installed Programs", tk.BooleanVar(name="installed_programs")),
+        ("TeamViewer", tk.BooleanVar(name="teamviewer")),
+        ("CBC", tk.BooleanVar(name="cbc")),
+        ("Browser History", tk.BooleanVar(name="browser_history"))  # New option added
     ]
 
     for module_name, module_var in modules:
@@ -87,7 +106,7 @@ def create_gui():
     toggle_button.pack(anchor=tk.W)
     tk.Button(root, text="Generate Batch File", command=on_select).pack(anchor=tk.W)
 
-    root.deiconify()  # Show the main window again for module selection
+    root.deiconify()
     root.mainloop()
 
 if __name__ == "__main__":
