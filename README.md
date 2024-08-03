@@ -53,9 +53,10 @@ Also make sure, that the executable is always run with administrative privileges
 #### GUI Mode
 
 1. Run `start_RapidExtractor.bat`.
-2. Select modules and generate the batch file with case and device names.
-3. Double click on the generated batch-file when the external drive is attached to suspect device.
-4. Wait for evidence to be collected.
+2. Enter case-name and device-name.
+3. Select modules and generate the batch file with case and device names.
+4. Double click on the generated batch-file when the external drive is attached to suspect device.
+5. Wait for evidence to be collected.
 
 #### Command Line Mode
 
