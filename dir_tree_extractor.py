@@ -5,9 +5,20 @@ import logging
 
 def generate_dir_tree(start_path, output_file):
     """
-    Generates a directory tree starting from start_path and writes it to output_file.
+    Generates a directory tree starting from the given path and writes it to the specified output file.
+
+    Args:
+    start_path (str): The root directory path to start generating the tree.
+    output_file (str): The file where the directory tree will be saved.
     """
     def tree(dir_path, prefix=''):
+        """
+        A helper function to recursively generate the directory tree structure.
+
+        Args:
+        dir_path (str): The current directory path.
+        prefix (str): The prefix for the current level in the directory tree.
+        """
         try:
             contents = sorted(os.listdir(dir_path))
         except PermissionError:
@@ -55,7 +66,10 @@ def generate_dir_tree(start_path, output_file):
 
 def extract_dir_tree(target_dir):
     """
-    Generate a directory tree of the C: drive and save it to a text file.
+    Extracts the directory tree starting from the root directory and saves it to the target directory.
+
+    Args:
+    target_dir (str): The directory where the output file will be saved.
     """
     start_time = time.time()
     root_dir = "C:\\"
@@ -69,3 +83,11 @@ def extract_dir_tree(target_dir):
     logging.info(f"Directory tree successfully saved to {output_file}. Extraction took {end_time - start_time:.2f} seconds.")
     print(f"Directory tree successfully saved to {output_file}")
     print(f"Extraction took {end_time - start_time:.2f} seconds")
+
+if __name__ == "__main__":
+    # Configure logging to record debug information in a log file.
+    logging.basicConfig(filename='logs/dir_tree_extractor.log', level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s')
+    target_directory = "DirTree_export"
+    extract_dir_tree(target_directory)
+    input("Press any key to close the window...")

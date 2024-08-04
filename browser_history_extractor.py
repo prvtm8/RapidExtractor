@@ -5,10 +5,11 @@ from tqdm import tqdm
 
 def copy_file_with_metadata(src, dst):
     """
-    Copy a file from src to dst, preserving metadata.
+    Copies a file from the source path to the destination path, preserving metadata.
     
-    :param src: Source file path
-    :param dst: Destination file path
+    Args:
+    src (str): The source file path.
+    dst (str): The destination file path.
     """
     if not os.path.exists(os.path.dirname(dst)):
         os.makedirs(os.path.dirname(dst))
@@ -16,12 +17,12 @@ def copy_file_with_metadata(src, dst):
 
 def extract_edge_history(target_dir):
     """
-    Extract Edge browser history to the target directory.
+    Extracts Microsoft Edge browsing history and copies it to the target directory.
     
-    :param target_dir: Directory where the history will be copied
+    Args:
+    target_dir (str): The directory where the history file will be copied.
     """
     try:
-        # Path to Edge history file
         edge_history_path = os.path.expandvars(r'%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\History')
         if os.path.exists(edge_history_path):
             edge_target_dir = os.path.join(target_dir, 'Edge')
@@ -34,12 +35,12 @@ def extract_edge_history(target_dir):
 
 def extract_firefox_history(target_dir):
     """
-    Extract Firefox browser history from all profiles to the target directory.
+    Extracts Mozilla Firefox browsing history and copies it to the target directory.
     
-    :param target_dir: Directory where the histories will be copied
+    Args:
+    target_dir (str): The directory where the history files will be copied.
     """
     try:
-        # Path to Firefox profiles directory
         firefox_profile_dir = os.path.expandvars(r'%APPDATA%\Mozilla\Firefox\Profiles')
         if os.path.exists(firefox_profile_dir):
             for profile in os.listdir(firefox_profile_dir):
@@ -55,12 +56,12 @@ def extract_firefox_history(target_dir):
 
 def extract_chrome_history(target_dir):
     """
-    Extract Chrome browser history to the target directory.
+    Extracts Google Chrome browsing history and copies it to the target directory.
     
-    :param target_dir: Directory where the history will be copied
+    Args:
+    target_dir (str): The directory where the history file will be copied.
     """
     try:
-        # Path to Chrome profile directory
         chrome_profile_dir = os.path.expandvars(r'%LOCALAPPDATA%\Google\Chrome\User Data\Default')
         if os.path.exists(chrome_profile_dir):
             chrome_history_path = os.path.join(chrome_profile_dir, 'History')
@@ -75,9 +76,10 @@ def extract_chrome_history(target_dir):
 
 def extract_browser_histories(target_dir):
     """
-    Extract browser histories for Edge, Firefox, and Chrome to the target directory.
+    Extracts browsing histories from Edge, Firefox, and Chrome and copies them to the target directory.
     
-    :param target_dir: Directory where the histories will be copied
+    Args:
+    target_dir (str): The directory where the history files will be copied.
     """
     try:
         if not os.path.exists(target_dir):
@@ -91,15 +93,9 @@ def extract_browser_histories(target_dir):
         logging.error(f"Error extracting browser histories: {e}")
 
 if __name__ == "__main__":
-    # Set up logging
-    logging.basicConfig(filename='browser_history_extractor.log', level=logging.DEBUG,
+    # Configure logging to record debug information in a log file.
+    logging.basicConfig(filename='logs/browser_history_extractor.log', level=logging.DEBUG,
                         format='%(asctime)s %(levelname)s %(message)s')
-    
-    # Define the target directory for exporting browser histories
     target_directory = "BrowserHistory_export"
-    
-    # Extract browser histories
     extract_browser_histories(target_directory)
-    
-    # Pause before closing the window
     input("Press any key to close the window...")

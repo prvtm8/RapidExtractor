@@ -5,7 +5,14 @@ import logging
 
 def copy_files_from_path(path, target_dir):
     """
-    Copies .txt and .log files from the given path to the target directory.
+    Copies all .txt and .log files from the specified path to the target directory.
+
+    Args:
+    path (str): The source directory to search for files.
+    target_dir (str): The destination directory where files will be copied.
+
+    Returns:
+    int: The number of files copied.
     """
     files_copied = 0
     
@@ -32,7 +39,10 @@ def copy_files_from_path(path, target_dir):
 
 def copy_teamviewer_files(target_dir):
     """
-    Copies TeamViewer log files from standard directories to the target directory.
+    Copies TeamViewer log and text files from common directories to the specified target directory.
+
+    Args:
+    target_dir (str): The directory where the files will be copied.
     """
     try:
         paths_to_search = [
@@ -65,8 +75,12 @@ def copy_teamviewer_files(target_dir):
         print(f"An error occurred while copying TeamViewer files: {e}")
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='teamviewer_extractor.log', level=logging.DEBUG,
+    # Configure logging to record debug information in a log file.
+    logging.basicConfig(filename='logs/teamviewer_extractor.log', level=logging.DEBUG,
                         format='%(asctime)s %(levelname)s %(message)s')
+    # Set the target directory for exporting TeamViewer files.
     target_directory = "TeamViewer_export"
+    # Copy TeamViewer files to the target directory.
     copy_teamviewer_files(target_directory)
+    # Wait for user input before closing the script.
     input("Press any key to close the window...")

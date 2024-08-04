@@ -3,6 +3,7 @@ import sys
 import shutil
 import time
 import logging
+from datetime import datetime
 from prefetch_extractor import copy_prefetch_files
 from dir_tree_extractor import extract_dir_tree
 from process_extractor import save_running_processes, save_running_tasks
@@ -11,29 +12,49 @@ from teamviewer_extractor import copy_teamviewer_files
 from cbc_extractor import copy_cbc_files
 from browser_history_extractor import extract_browser_histories
 
-def create_target_folder(target_device_name):
+def create_target_folder(case_name, device_name):
     """
-    Create a target folder for the extraction process.
+    Creates the target folder where the extraction results will be stored.
 
     Args:
-        target_device_name (str): The name of the target device.
+        case_name (str): The name of the case or operation.
+        device_name (str): The name of the target device.
 
     Returns:
-        str: The path to the created target directory.
+        str: The path to the target directory.
     """
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    target_dir = os.path.join(base_dir, f'{target_device_name}_extraction')
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cases'))
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    target_dir = os.path.join(base_dir, f"{case_name}_{current_date}", device_name, 'extraction_results')
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
     return target_dir
 
-def zip_directory(directory_path, zip_name):
+def create_log_folder(case_name, device_name):
     """
-    Zip a directory and remove the original directory after zipping.
+    Creates the log folder where the log files will be stored.
 
     Args:
-        directory_path (str): The path to the directory to zip.
-        zip_name (str): The name of the zip file to create.
+        case_name (str): The name of the case or operation.
+        device_name (str): The name of the target device.
+
+    Returns:
+        str: The path to the log directory.
+    """
+    base_log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cases'))
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    log_dir = os.path.join(base_log_dir, f"{case_name}_{current_date}", device_name, 'logs')
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    return log_dir
+
+def zip_directory(directory_path, zip_name):
+    """
+    Zips the contents of a directory and then removes the original directory.
+
+    Args:
+        directory_path (str): The path to the directory to be zipped.
+        zip_name (str): The name of the resulting zip file (without extension).
     """
     logging.info(f"Zipping directory {directory_path} to {zip_name}.zip...")
     shutil.make_archive(zip_name, 'zip', directory_path)
@@ -41,18 +62,21 @@ def zip_directory(directory_path, zip_name):
     shutil.rmtree(directory_path)
     logging.info(f"Removed original directory {directory_path}.")
 
-def main(selected_modules, target_device_name):
+def main(selected_modules, case_name, device_name):
     """
-    Main function to perform the data extraction based on the selected modules.
+    Main function to perform the data extraction based on selected modules.
 
     Args:
-        selected_modules (list): List of selected modules for extraction.
-        target_device_name (str): The name of the target device.
+        selected_modules (list): A list of selected modules for extraction.
+        case_name (str): The name of the case or operation.
+        device_name (str): The name of the target device.
     """
-    target_dir_base = create_target_folder(target_device_name)
+    # Create target and log directories
+    target_dir_base = create_target_folder(case_name, device_name)
+    log_dir = create_log_folder(case_name, device_name)
 
-    # Configure logging to use a file in the target directory
-    log_file_path = os.path.join(target_dir_base, 'extraction.log')
+    # Configure logging
+    log_file_path = os.path.join(log_dir, 'extraction.log')
     logging.basicConfig(filename=log_file_path, level=logging.DEBUG,
                         format='%(asctime)s %(levelname)s [%(module)s] %(message)s')
 
@@ -155,14 +179,15 @@ def main(selected_modules, target_device_name):
     input("Press any key to close the window...")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: main.py <selected_modules> <target_device_name>")
+    if len(sys.argv) != 4:
+        print("Usage: main.py <selected_modules> <case_name> <device_name>")
         sys.exit(1)
     
     selected_modules = sys.argv[1].split()
-    target_device_name = sys.argv[2]
+    case_name = sys.argv[2]
+    device_name = sys.argv[3]
     try:
-        main(selected_modules, target_device_name)
+        main(selected_modules, case_name, device_name)
     except Exception as e:
         logging.critical(f"Critical error in main execution: {e}")
         sys.exit(1)

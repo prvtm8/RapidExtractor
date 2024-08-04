@@ -1,15 +1,15 @@
-import os  
-import winreg  # Provides access to the Windows registry
-import logging  
-from datetime import datetime  # Used for date and time operations
-from tqdm import tqdm  # Used for progress bars
+import os
+import winreg
+import logging
+from datetime import datetime
+from tqdm import tqdm
 
 def get_programs_from_registry():
     """
-    Retrieve a list of installed programs from the Windows registry.
-
+    Retrieves a list of installed programs from the Windows registry.
+    
     Returns:
-        list: A list of dictionaries containing program details.
+    list: A list of dictionaries containing program details.
     """
     uninstall_paths = [
         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
@@ -25,11 +25,9 @@ def get_programs_from_registry():
     
     programs = []
 
-    # Check in HKEY_LOCAL_MACHINE
     for uninstall_path in uninstall_paths:
         programs.extend(query_registry_key(winreg.HKEY_LOCAL_MACHINE, uninstall_path))
 
-    # Check in HKEY_CURRENT_USER
     for uninstall_path in user_uninstall_paths:
         programs.extend(query_registry_key(winreg.HKEY_CURRENT_USER, uninstall_path))
 
@@ -37,14 +35,14 @@ def get_programs_from_registry():
 
 def query_registry_key(root_key, uninstall_path):
     """
-    Query a specific registry key to retrieve installed programs.
+    Queries a specific registry key for installed programs.
 
     Args:
-        root_key: The root key to start the query from.
-        uninstall_path (str): The registry path to query.
+    root_key (int): The root key (HKEY_LOCAL_MACHINE or HKEY_CURRENT_USER).
+    uninstall_path (str): The registry path to query.
 
     Returns:
-        list: A list of dictionaries containing program details.
+    list: A list of dictionaries containing program details.
     """
     programs = []
     try:
@@ -71,14 +69,14 @@ def query_registry_key(root_key, uninstall_path):
 
 def query_registry_value(key, value_name):
     """
-    Query a specific value from a registry key.
+    Queries a specific value in a registry key.
 
     Args:
-        key: The registry key to query.
-        value_name (str): The name of the value to retrieve.
+    key (PyHKEY): The registry key.
+    value_name (str): The value name to query.
 
     Returns:
-        str: The value retrieved from the registry, or "Unknown" if not found.
+    str: The value data, or "Unknown" if not found.
     """
     try:
         value, regtype = winreg.QueryValueEx(key, value_name)
@@ -92,13 +90,13 @@ def query_registry_value(key, value_name):
 
 def remove_duplicates(programs):
     """
-    Remove duplicate programs from the list.
+    Removes duplicate entries from the list of programs.
 
     Args:
-        programs (list): The list of programs to remove duplicates from.
+    programs (list): The list of program dictionaries.
 
     Returns:
-        list: A list of unique programs.
+    list: A list of unique program dictionaries.
     """
     seen = set()
     unique_programs = []
@@ -111,13 +109,13 @@ def remove_duplicates(programs):
 
 def get_file_times(file_path):
     """
-    Retrieve the creation, modification, and access times of a file.
+    Retrieves the creation, modification, and access times of a file.
 
     Args:
-        file_path (str): The path to the file.
+    file_path (str): The file path.
 
     Returns:
-        dict: A dictionary containing the creation, modification, and access times.
+    dict: A dictionary with 'created', 'modified', and 'accessed' timestamps.
     """
     try:
         file_stats = os.stat(file_path)
@@ -142,13 +140,13 @@ def get_file_times(file_path):
 
 def find_executables_in_directories(directories):
     """
-    Find executable files in the specified directories.
+    Finds executable files in specified directories and retrieves their metadata.
 
     Args:
-        directories (list): A list of directories to search for executables.
+    directories (list): A list of directory paths to search.
 
     Returns:
-        list: A list of dictionaries containing executable file details.
+    list: A list of dictionaries containing executable file details.
     """
     executables = []
     for directory in directories:
@@ -168,10 +166,10 @@ def find_executables_in_directories(directories):
 
 def save_installed_programs(target_dir):
     """
-    Save the list of installed programs and executables to the specified target directory.
+    Saves details of installed programs and executable files to the target directory.
 
     Args:
-        target_dir (str): The directory where the program details will be saved.
+    target_dir (str): The directory where the program details will be saved.
     """
     try:
         if not os.path.exists(target_dir):
@@ -192,14 +190,14 @@ def save_installed_programs(target_dir):
             if not os.path.exists(program_dir):
                 os.makedirs(program_dir)
             
-            if 'path' in program:  # This is an executable
+            if 'path' in program:
                 file_times = {
                     'created': program['created'],
                     'modified': program['modified'],
                     'accessed': program['accessed']
                 }
                 install_location = program['path']
-            else:  # This is a registered program
+            else:
                 file_times = get_file_times(program['install_location']) if program['install_location'] != "Unknown" else {
                     'created': "Unknown",
                     'modified': "Unknown",
@@ -222,8 +220,12 @@ def save_installed_programs(target_dir):
         logging.error(f"Error saving installed programs: {e}")
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='installed_programs_extractor.log', level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s %(message)s')  # Configure logging
-    target_directory = "InstalledPrograms_export"  # Set the target directory for installed programs
-    save_installed_programs(target_directory)  # Save the installed programs to the target directory
-    input("Press any key to close the window...")  # Wait for user input before closing the window
+    # Configure logging to record debug information in a log file.
+    logging.basicConfig(filename='logs/installed_programs_extractor.log', level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s')
+    # Set the target directory for exporting installed programs.
+    target_directory = "InstalledPrograms_export"
+    # Save installed programs and executables to the target directory.
+    save_installed_programs(target_directory)
+    # Wait for user input before closing the script.
+    input("Press any key to close the window...")

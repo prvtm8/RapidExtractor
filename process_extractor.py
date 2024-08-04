@@ -5,7 +5,10 @@ import logging
 
 def save_running_processes(target_dir):
     """
-    Saves a list of currently running processes to a text file.
+    Saves the list of currently running processes to a specified directory.
+
+    Args:
+    target_dir (str): The directory where the running processes file will be saved.
     """
     try:
         if not os.path.exists(target_dir):
@@ -25,7 +28,10 @@ def save_running_processes(target_dir):
 
 def save_running_tasks(target_dir):
     """
-    Saves a list of currently scheduled tasks to a text file.
+    Saves the list of currently running scheduled tasks to a specified directory.
+
+    Args:
+    target_dir (str): The directory where the running tasks file will be saved.
     """
     try:
         if not os.path.exists(target_dir):
@@ -42,3 +48,12 @@ def save_running_tasks(target_dir):
     except Exception as e:
         logging.error(f"An error occurred while saving running tasks: {e}")
         print(f"An error occurred while saving running tasks: {e}")
+
+if __name__ == "__main__":
+    # Configure logging to record debug information in a log file.
+    logging.basicConfig(filename='logs/process_extractor.log', level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s')
+    target_directory = "Processes_export"
+    save_running_processes(target_directory)
+    save_running_tasks(target_directory)
+    input("Press any key to close the window...")
