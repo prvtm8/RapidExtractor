@@ -1,6 +1,4 @@
 @echo off
-REM Turn off command echoing to keep the command prompt clean
-
 REM Dynamically determine the drive letter of the USB stick
 set USB_DRIVE=%~d0
 
@@ -8,9 +6,9 @@ REM Set the path to the portable Python interpreter
 set "PYTHON_PATH=%USB_DRIVE%\WPy64-31241\python-3.12.4.amd64\python.exe"
 
 REM Set the path to the main Python script
-set "SCRIPT_PATH=%USB_DRIVE%\RapidExtractor\Scripts\gui.py"
+set "SCRIPT_PATH=%USB_DRIVE%\RapidExtractor\scripts\gui.py"
 
-REM Debug output to verify paths
+REM Debug output
 echo Python Path: %PYTHON_PATH%
 echo Script Path: %SCRIPT_PATH%
 
@@ -28,8 +26,7 @@ if not exist "%SCRIPT_PATH%" (
     exit /b
 )
 
-REM Run the main script
-"%PYTHON_PATH%" "%SCRIPT_PATH%"
+REM Run the main script with selected modules
+"%PYTHON_PATH%" "%SCRIPT_PATH%" %*
 
-REM Pause the script to allow the user to see the output
 pause
